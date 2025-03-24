@@ -15,17 +15,17 @@ import Announcement from "./Announcment";
 
 const Header = () => {
   const navigate = useNavigate();
-  const user = true;
+  const user = false;
 
   return (
     <header>
       <Announcement />
-      <nav className="px-4 md:px-6 lg:px-10 py-6 flex items-center justify-between">
+      <nav className="px-4 md:px-6 lg:px-24 py-6 flex items-center justify-between">
         <Link to="/">
           <img
             src="/YURL.png"
             alt="YURL-Logo"
-            className="h-12 sm:h-10 md:h-12 lg:h-14"
+            className="h-12 sm:h-10 md:h-12"
           />
         </Link>
 
