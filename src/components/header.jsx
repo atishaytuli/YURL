@@ -11,50 +11,54 @@ import {
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LinkIcon, LogOut } from "lucide-react";
+import Announcement from "./Announcment";
 
 const Header = () => {
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
   const user = true;
 
   return (
-    <nav className="px-4 md:px-6 lg:px-10 py-6 flex items-center justify-between">
-      <Link to="/">
-        <img
-          src="/YURL.png"
-          alt="YURL-Logo"
-          className="h-12 sm:h-10 md:h-12 lg:h-14"
-        />
-      </Link>
+    <header>
+      <Announcement />
+      <nav className="px-4 md:px-6 lg:px-10 py-6 flex items-center justify-between">
+        <Link to="/">
+          <img
+            src="/YURL.png"
+            alt="YURL-Logo"
+            className="h-12 sm:h-10 md:h-12 lg:h-14"
+          />
+        </Link>
 
-      <div>
-        {!user ? (
-          <Button onClick={() => Navigate("/auth")}>Login</Button>
-        ) : (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="w-12 h-12 rounded-full overflow-hidden outline-none border-2 border-orange-500">
-                <Avatar className="w-12 h-12">
-                  <AvatarImage src="https://github.com/shadcn.png" alt="User Avatar" />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <LinkIcon />
-                <span>My Links</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-red-500 font-semibold">
-                <LogOut className="h-4" />
-                <span>LogOut</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </div>
-    </nav>
+        <div>
+          {!user ? (
+            <Button onClick={() => navigate("/auth")}>Login</Button>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="w-12 h-12 rounded-full overflow-hidden outline-none border-2 border-orange-500">
+                  <Avatar className="w-12 h-12">
+                    <AvatarImage src="https://github.com/shadcn.png" alt="User Avatar" />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <LinkIcon />
+                  <span>My Links</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-red-500 font-semibold">
+                  <LogOut className="h-4" />
+                  <span>LogOut</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+      </nav>
+    </header>
   );
 };
 
