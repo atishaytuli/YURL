@@ -43,28 +43,28 @@
 
 @font-face {
   font-family: "Yrul";
-  src: url("../public/fonts/yurl-Regular.woff") format("woff");
+  src: url("/fonts/yurl-Regular.woff") format("woff");
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Yrul";
-  src: url("../public/fonts/yurl-Medium.woff") format("woff");
+  src: url("/fonts/yurl-Medium.woff") format("woff");
   font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Yrul";
-  src: url("../public/fonts/yurl-SemiBold.woff") format("woff");
+  src: url("/fonts/yurl-SemiBold.woff") format("woff");
   font-weight: 600;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Yrul";
-  src: url("../public/fonts/yurl-Bold.woff") format("woff");
+  src: url("/fonts/yurl-Bold.woff") format("woff");
   font-weight: 700;
   font-style: normal;
 }

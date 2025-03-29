@@ -8,7 +8,7 @@ const AppLayout = () => {
     <>
       <Header />
 
-      <main className="min-h-screen w-full container mx-auto px-4">
+      <main className="min-h-screen w-full container mx-auto ">
         <Outlet />
 
       </main>

@@ -12,10 +12,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LinkIcon, LogOut } from "lucide-react";
 import Announcement from "./Announcment";
+import { UrlState } from "@/context";
 
 const Header = () => {
   const navigate = useNavigate();
-  const user = false;
+  const {user, fetchUser}= UrlState()
 
   return (
     <header>

@@ -1,3 +1,4 @@
+import {Input} from "./ui/input";
 import {
   Card,
   CardContent,
@@ -5,32 +6,23 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-
-import { Input } from "@/components/ui/input";
-import { Button } from "./ui/button";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+} from "./ui/card";
+import {Button} from "../components/ui/button";
+import {useNavigate, useSearchParams} from "react-router-dom";
+import {useEffect, useState} from "react";
 import * as Yup from "yup";
 import Error from "./error";
-import { login } from "@/db/apiAuth";
-import { BeatLoader } from "react-spinners";
+import {login} from "@/db/apiAuth";
+import {BeatLoader} from "react-spinners";
 import useFetch from "@/hooks/use-fetch";
-import { UrlState } from "@/context";
-
-const schema = Yup.object().shape({
-  email: Yup.string().email("Invalid Email").required("Email is required"),
-  password: Yup.string()
-    .min(8, "It must be at least 8 characters long")
-    .required("Password is required"),
-});
+import {UrlState} from "@/context";
+import { User, Mail, Lock, Upload } from "lucide-react";
 
 const Login = () => {
   let [searchParams] = useSearchParams();
   const longLink = searchParams.get("createNew");
 
   const navigate = useNavigate();
-  const { fetchUser } = UrlState();
 
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
@@ -38,83 +30,90 @@ const Login = () => {
     password: "",
   });
 
-  const { loading, error, fn: fnLogin, data } = useFetch(login, formData);
-
-  useEffect(() => {
-    if (!error && data) {
-      fetchUser();
-      navigate(`/dashboard?${longLink ? `createNew=${longLink}` : ""}`);
-    }
-  }, [error, data, fetchUser, longLink, navigate]);
-
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const {name, value} = e.target;
     setFormData((prevState) => ({
       ...prevState,
       [name]: value,
     }));
   };
 
+  const {loading, error, fn: fnLogin, data} = useFetch(login, formData);
+  const {fetchUser} = UrlState();
+
+  useEffect(() => {
+    if (error === null && data) {
+      fetchUser();
+      navigate(`/dashboard?${longLink ? `createNew=${longLink}` : ""}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error, data]);
+
   const handleLogin = async () => {
-    setErrors({});
+    setErrors([]);
     try {
-      await schema.validate(formData, { abortEarly: false });
+      const schema = Yup.object().shape({
+        email: Yup.string()
+          .email("Invalid email")
+          .required("Email is required"),
+        password: Yup.string()
+          .min(6, "Password must be at least 6 characters")
+          .required("Password is required"),
+      });
+
+      await schema.validate(formData, {abortEarly: false});
       await fnLogin();
     } catch (e) {
       const newErrors = {};
+
       e?.inner?.forEach((err) => {
         newErrors[err.path] = err.message;
       });
+
       setErrors(newErrors);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <Card className="w-full max-w-sm p-6 shadow-md bg-white">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Log In</CardTitle>
-          <CardDescription>Enter your credentials to access your account</CardDescription>
-          {error && <Error message={error.message} />}
-        </CardHeader>
+    <Card>
+      <CardHeader>
+        <CardTitle>Login</CardTitle>
+        <CardDescription>
+          to your YURL account if you already have one
+        </CardDescription>
+        {error && <Error message={error.message} />}
+      </CardHeader>
+      <CardContent className="space-y-2">
+      <div className="relative">
+  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+  <Input
+    name="email"
+    type="email"
+    placeholder="Enter Email"
+                  className="pl-10"
+    onChange={handleInputChange}
+  />
+</div>
 
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="email" className="block font-medium">Email Address</label>
-            <Input
-              name="email"
-              type="email"
-              id="email"
-              placeholder="Enter your email here"
-              onChange={handleInputChange}
-            />
-            {errors.email && <Error message={errors.email} />}
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="password" className="block font-medium">Password</label>
-            <Input
-              name="password"
-              type="password"
-              id="password"
-              placeholder="Use a strong password"
-              onChange={handleInputChange}
-            />
-            {errors.password && <Error message={errors.password} />}
-          </div>
-        </CardContent>
-
-        <CardFooter className="flex justify-center">
-          <Button
-            className="px-6 w-full flex items-center justify-center gap-2"
-            onClick={handleLogin}
-            disabled={loading}
-          >
-            {loading ? <BeatLoader size={10} color="#36d7b7" /> : "Log In"}
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
+        {errors.email && <Error message={errors.email} />}
+        <div className="relative">
+        <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+          <Input
+            name="password"
+            type="password"
+            placeholder="Enter Password"
+                          className="pl-10"
+            onChange={handleInputChange}
+          />
+        </div>
+        {errors.password && <Error message={errors.password} />}
+      </CardContent>
+      <CardFooter>
+        <Button onClick={handleLogin}>
+          {loading ? <BeatLoader size={10} color="#36d7b7" /> : "Login"}
+        </Button>
+      </CardFooter>
+    </Card>
   );
 };
 
