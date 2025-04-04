@@ -1,42 +1,131 @@
-import {storeClicks} from "@/db/apiClicks";
-import {getLongUrl} from "@/db/apiUrls";
-import useFetch from "@/hooks/use-fetch";
-import {useEffect} from "react";
-import {useParams} from "react-router-dom";
-import {BarLoader} from "react-spinners";
+import { storeClicks } from "@/db/apiClicks"
+import { getLongUrl } from "@/db/apiUrls"
+import useFetch from "@/hooks/use-fetch"
+import { useEffect, useState } from "react"
+import { useParams, useNavigate } from "react-router-dom"
+import { BarLoader } from "react-spinners"
+import { Button } from "@/components/ui/button"
+import { ExternalLink, AlertTriangle } from "lucide-react"
 
 const RedirectLink = () => {
-  const {id} = useParams();
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const [redirectUrl, setRedirectUrl] = useState(null)
+  const [error, setError] = useState(null)
+  const [countdown, setCountdown] = useState(5)
 
-  const {loading, data, fn} = useFetch(getLongUrl, id);
+  // Fetch the original URL
+  const { loading, data, fn: fetchUrl } = useFetch(getLongUrl, id)
 
-  const {loading: loadingStats, fn: fnStats} = useFetch(storeClicks, {
+  // Record the click and get the redirect URL
+  const { fn: recordClick } = useFetch(storeClicks, {
     id: data?.id,
     originalUrl: data?.original_url,
-  });
+  })
 
+  // Fetch the URL when component mounts
   useEffect(() => {
-    fn();
-  }, []);
-
-  useEffect(() => {
-    if (!loading && data) {
-      fnStats();
+    if (id) {
+      fetchUrl().catch((err) => {
+        setError(err.message || "URL not found")
+      })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading]);
+  }, [id])
 
-  if (loading || loadingStats) {
-    return (
-      <>
-        <BarLoader width={"100%"} color="#36d7b7" />
-        <br />
-        Redirecting...
-      </>
-    );
+  // Record click and prepare for redirect when data is loaded
+  useEffect(() => {
+    if (!loading && data && data.original_url) {
+      recordClick()
+        .then((url) => {
+          setRedirectUrl(url)
+        })
+        .catch((err) => {
+          console.error("Error recording click:", err)
+          // Still set the redirect URL even if click recording fails
+          let url = data.original_url
+          if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            url = "https://" + url
+          }
+          setRedirectUrl(url)
+        })
+    }
+  }, [loading, data])
+
+  // Countdown and redirect
+  useEffect(() => {
+    if (redirectUrl) {
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer)
+            window.location.href = redirectUrl
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+
+      return () => clearInterval(timer)
+    }
+  }, [redirectUrl])
+
+  // Handle manual redirect
+  const handleManualRedirect = () => {
+    if (redirectUrl) {
+      window.location.href = redirectUrl
+    }
   }
 
-  return null;
-};
+  // Handle going back to home
+  const handleGoHome = () => {
+    navigate("/")
+  }
 
-export default RedirectLink;
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <AlertTriangle className="h-16 w-16 text-red-500 mb-4" />
+        <h1 className="text-2xl font-bold mb-2">Link Not Found</h1>
+        <p className="text-gray-600 mb-6 text-center">
+          The URL you're trying to access doesn't exist or has been removed.
+        </p>
+        <Button onClick={handleGoHome}>Go to Homepage</Button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+      <BarLoader width={"100%"} color="#36d7b7" className="mb-6" />
+
+      <h1 className="text-2xl font-bold mb-2">Redirecting you...</h1>
+
+      {redirectUrl && (
+        <>
+          <p className="text-gray-600 mb-6 text-center">
+            You are being redirected to:
+            <br />
+            <span className="font-medium break-all">{redirectUrl}</span>
+          </p>
+          <p className="text-gray-600 mb-4">
+            Redirecting in <span className="font-bold">{countdown}</span> seconds...
+          </p>
+
+          <div className="flex gap-4">
+            <Button onClick={handleManualRedirect} className="flex items-center">
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Go Now
+            </Button>
+
+            <Button variant="outline" onClick={handleGoHome}>
+              Cancel
+            </Button>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+export default RedirectLink
+

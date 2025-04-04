@@ -33,7 +33,7 @@ const LandingPage = () => {
           placeholder="paste your long https://exampleyurl.com here"
           className="h-full flex-1 py-2 px-4 outline-none border-blue-900 focus:outline-none"
         />
-        <Button className="h-full" type="submit">
+        <Button className="h-full transform transition-all duration-300 ease-in-out hover:rounded-xl" type="submit">
           Get your link for free <ArrowRight />
         </Button>
       </form>

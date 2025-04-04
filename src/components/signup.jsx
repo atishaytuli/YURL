@@ -1,6 +1,6 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import Error from "./error";
-import {Input} from "./ui/input";
+import { Input } from "@/components/ui/input";
 import * as Yup from "yup";
 import {
   Card,
@@ -9,19 +9,19 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "./ui/card";
-import {Button} from "./ui/button";
-import {useNavigate, useSearchParams} from "react-router-dom";
-import {signup} from "@/db/apiAuth";
-import {BeatLoader} from "react-spinners";
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { signup } from "@/db/apiAuth";
+import { BeatLoader } from "react-spinners";
 import useFetch from "@/hooks/use-fetch";
+import { UrlState } from "@/context";
+import { User, Mail, Lock, Upload } from 'lucide-react';
 
 const Signup = () => {
-  let [searchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const longLink = searchParams.get("createNew");
-
   const navigate = useNavigate();
-
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     name: "",
@@ -29,27 +29,38 @@ const Signup = () => {
     password: "",
     profile_pic: null,
   });
+  const [fileName, setFileName] = useState("");
+  const { fetchUser } = UrlState();
 
   const handleInputChange = (e) => {
-    const {name, value, files} = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: files ? files[0] : value,
-    }));
+    const { name, value, files } = e.target;
+    if (name === "profile_pic" && files && files[0]) {
+      setFileName(files[0].name);
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]: files[0],
+      }));
+    } else {
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
   };
 
-  const {loading, error, fn: fnSignup, data} = useFetch(signup, formData);
+  const { loading, error, fn: fnSignup, data } = useFetch(signup, formData);
 
   useEffect(() => {
-    console.log("Signup response:", data);
     if (data) {
-      navigate(`/dashboard?${longLink ? `createNew=${longLink}` : ""}`);
+      // Fetch user data after successful signup
+      fetchUser();
+      // Navigate to dashboard with the longLink parameter if it exists
+      navigate(longLink ? `/dashboard?createNew=${longLink}` : "/dashboard");
     }
-  }, [data, navigate, longLink]); 
-  
+  }, [data, navigate, longLink, fetchUser]);
 
   const handleSignup = async () => {
-    setErrors([]);
+    setErrors({});
     try {
       const schema = Yup.object().shape({
         name: Yup.string().required("Name is required"),
@@ -62,7 +73,7 @@ const Signup = () => {
         profile_pic: Yup.mixed().required("Profile picture is required"),
       });
 
-      await schema.validate(formData, {abortEarly: false});
+      await schema.validate(formData, { abortEarly: false });
       await fnSignup();
     } catch (error) {
       const newErrors = {};
@@ -70,10 +81,9 @@ const Signup = () => {
         error.inner.forEach((err) => {
           newErrors[err.path] = err.message;
         });
-
         setErrors(newErrors);
-      } else {
-        setErrors({api: error.message});
+      } else if (error?.message) {
+        setErrors({ api: error.message });
       }
     }
   };
@@ -85,48 +95,70 @@ const Signup = () => {
         <CardDescription>
           Create a new account if you haven&rsquo;t already
         </CardDescription>
-        {error && <Error message={error?.message} />}
+        {/* Fix: Only render the error message string, not the error object */}
+        {error && <Error message={typeof error === 'object' ? error.message : String(error)} />}
       </CardHeader>
       <CardContent className="space-y-2">
-        <div className="space-y-1">
+        <div className="relative">
+          <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
           <Input
             name="name"
             type="text"
             placeholder="Enter Name"
+            className="pl-10"
             onChange={handleInputChange}
+            value={formData.name}
           />
         </div>
         {errors.name && <Error message={errors.name} />}
-        <div className="space-y-1">
+        
+        <div className="relative">
+          <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
           <Input
             name="email"
             type="email"
             placeholder="Enter Email"
+            className="pl-10"
             onChange={handleInputChange}
+            value={formData.email}
           />
         </div>
         {errors.email && <Error message={errors.email} />}
-        <div className="space-y-1">
+        
+        <div className="relative">
+          <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
           <Input
             name="password"
             type="password"
             placeholder="Enter Password"
+            className="pl-10"
             onChange={handleInputChange}
+            value={formData.password}
           />
         </div>
         {errors.password && <Error message={errors.password} />}
-        <div className="space-y-1">
-          <input
-            name="profile_pic"
-            type="file"
-            accept="image/*"
-            onChange={handleInputChange}
-          />
+        
+        <div className="relative">
+          <div className="flex items-center gap-2 border rounded-md p-2">
+            <Upload className="h-4 w-4 text-gray-400" />
+            <label htmlFor="profile-pic" className="cursor-pointer text-sm text-gray-500">
+              {fileName || "Choose profile picture"}
+            </label>
+            <input
+              id="profile-pic"
+              name="profile_pic"
+              type="file"
+              accept="image/*"
+              onChange={handleInputChange}
+              className="hidden"
+            />
+          </div>
         </div>
         {errors.profile_pic && <Error message={errors.profile_pic} />}
+        {errors.api && <Error message={errors.api} />}
       </CardContent>
       <CardFooter>
-        <Button onClick={handleSignup}>
+        <Button onClick={handleSignup} className="w-full">
           {loading ? (
             <BeatLoader size={10} color="#36d7b7" />
           ) : (

@@ -4,8 +4,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {useNavigate } from "react-router-dom";
 
 const Cards = () => {
+  const navigate = useNavigate();
   return (
     <div className="relative bg-[#F7F4EE] mt-12 w-full px-6 md:px-12 py-16 md:py-20 flex flex-col items-center">
       <img
@@ -28,7 +30,7 @@ const Cards = () => {
           </span>
         </p>
 
-        <button className="mt-12 flex items-center gap-2 bg-blue-900 text-white px-6 py-3  font-semibold shadow-md hover:bg-blue-700 transition-all mx-auto hover:rounded-lg">
+        <button className="mt-12 flex items-center gap-2 bg-blue-900 text-white px-6 py-3  font-semibold shadow-md hover:bg-blue-700 transition-all mx-auto hover:rounded-lg" onClick={() => navigate("/auth")}>
           Get Started
           <img src="./star.svg" alt="Star Icon" className="w-4" />
         </button>
