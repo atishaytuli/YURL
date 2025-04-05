@@ -83,10 +83,10 @@ const RedirectLink = () => {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <AlertTriangle className="h-16 w-16 text-red-500 mb-4" />
-        <h1 className="text-2xl font-bold mb-2">Link Not Found</h1>
-        <p className="text-gray-600 mb-6 text-center">
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6">
+        <AlertTriangle className="h-12 w-12 sm:h-16 sm:w-16 text-red-500 mb-4" />
+        <h1 className="text-xl sm:text-2xl font-bold mb-2 text-center">Link Not Found</h1>
+        <p className="text-gray-600 mb-6 text-center text-sm sm:text-base max-w-md">
           The URL you're trying to access doesn't exist or has been removed.
         </p>
         <Button onClick={handleGoHome}>Go to Homepage</Button>
@@ -95,24 +95,24 @@ const RedirectLink = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6">
       <BarLoader width={"100%"} color="#36d7b7" className="mb-6" />
 
-      <h1 className="text-2xl font-bold mb-2">Redirecting you...</h1>
+      <h1 className="text-xl sm:text-2xl font-bold mb-2 text-center">Redirecting you...</h1>
 
       {redirectUrl && (
         <>
-          <p className="text-gray-600 mb-6 text-center">
+          <p className="text-gray-600 mb-6 text-center text-sm sm:text-base max-w-md">
             You are being redirected to:
             <br />
             <span className="font-medium break-all">{redirectUrl}</span>
           </p>
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-600 mb-4 text-center">
             Redirecting in <span className="font-bold">{countdown}</span> seconds...
           </p>
 
-          <div className="flex gap-4">
-            <Button onClick={handleManualRedirect} className="flex items-center">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <Button onClick={handleManualRedirect} className="flex items-center justify-center">
               <ExternalLink className="h-4 w-4 mr-2" />
               Go Now
             </Button>

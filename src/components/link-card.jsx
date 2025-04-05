@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { deleteUrl } from "@/db/apiUrls"
 import useFetch from "@/hooks/use-fetch"
-import { Toast, } from "@/components/ui/toast"
+import { Toast } from "@/components/ui/toast"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,13 +27,13 @@ const LinkCard = ({ url, fetchUrls }) => {
   const handleDelete = async () => {
     try {
       await fnDelete()
-      Toast,({
+      Toast({
         title: "Success",
         description: "URL deleted successfully",
       })
       if (fetchUrls) fetchUrls()
     } catch (error) {
-      Toast,({
+      Toast({
         title: "Error",
         description: error.message || "Failed to delete URL",
         variant: "destructive",
@@ -51,13 +51,13 @@ const LinkCard = ({ url, fetchUrls }) => {
     navigator.clipboard
       .writeText(fullUrl)
       .then(() => {
-        Toast,({
+        Toast({
           title: "Copied!",
           description: "URL copied to clipboard",
         })
       })
       .catch(() => {
-        Toast,({
+        Toast({
           title: "Error",
           description: "Failed to copy URL",
           variant: "destructive",
@@ -83,41 +83,48 @@ const LinkCard = ({ url, fetchUrls }) => {
       <CardContent className="p-0">
         <div className="flex flex-col md:flex-row">
           {/* QR Code Preview */}
-          <div className="w-full md:w-32 h-32 bg-white flex items-center justify-center border-b md:border-b-0 md:border-r border-gray-200">
-            <img src={url.qr || "/placeholder.svg"} alt="QR Code" className="h-24 w-24 object-contain" />
+          <div className="w-full md:w-24 lg:w-32 h-24 md:h-full bg-white flex items-center justify-center border-b md:border-b-0 md:border-r border-gray-200">
+            <img src={url.qr || "/placeholder.svg"} alt="QR Code" className="h-20 w-20 object-contain" />
           </div>
 
           {/* URL Details */}
-          <div className="flex-1 p-4 flex flex-col">
-            <div className="flex justify-between items-start mb-2">
-              <Link to={`/link/${url.id}`} className="text-xl font-bold hover:underline">
+          <div className="flex-1 p-3 sm:p-4 flex flex-col">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0 mb-2">
+              <Link to={`/link/${url.id}`} className="text-lg sm:text-xl font-bold hover:underline line-clamp-1">
                 {url.title}
               </Link>
               <span className="text-xs text-gray-500">{formattedDate}</span>
             </div>
 
-            <div className="mb-2">
+            <div className="mb-1 sm:mb-2">
               <a
                 href={shortUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-500 hover:underline flex items-center gap-1"
+                className="text-blue-500 hover:underline flex items-center gap-1 text-sm sm:text-base"
               >
                 {shortUrl}
-                <ExternalLink className="h-3 w-3" />
+                <ExternalLink className="h-3 w-3 flex-shrink-0" />
               </a>
             </div>
 
-            <div className="text-gray-500 text-sm mb-4 break-all">{truncateUrl(url.original_url)}</div>
+            <div className="text-gray-500 text-xs sm:text-sm mb-3 sm:mb-4 break-all line-clamp-1">
+              {truncateUrl(url.original_url)}
+            </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-2 mt-auto">
-              <Button variant="outline" size="sm" onClick={copyToClipboard} className="flex items-center">
+            <div className="flex flex-wrap gap-2 mt-auto">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={copyToClipboard}
+                className="flex items-center h-8 text-xs sm:text-sm px-2 sm:px-3"
+              >
                 <Copy className="h-3 w-3 mr-1" />
                 Copy
               </Button>
 
-              <Button variant="outline" size="sm" asChild>
+              <Button variant="outline" size="sm" asChild className="h-8 text-xs sm:text-sm px-2 sm:px-3">
                 <Link to={`/link/${url.id}`} className="flex items-center">
                   <QrCode className="h-3 w-3 mr-1" />
                   Details
@@ -128,7 +135,7 @@ const LinkCard = ({ url, fetchUrls }) => {
                 variant="destructive"
                 size="sm"
                 onClick={() => setShowDeleteDialog(true)}
-                className="flex items-center"
+                className="flex items-center h-8 text-xs sm:text-sm px-2 sm:px-3"
               >
                 <Trash className="h-3 w-3 mr-1" />
                 Delete
@@ -140,14 +147,14 @@ const LinkCard = ({ url, fetchUrls }) => {
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
               This will permanently delete the URL "{url.title}" and all its statistics. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} disabled={loading} className="bg-red-500 hover:bg-red-600">
               {loading ? "Deleting..." : "Delete"}

@@ -100,7 +100,7 @@ export function CreateLink({ isOpen, setIsOpen, onSuccess }) {
       })
 
       // Show success message
-      Toast,({
+      Toast({
         title: "Success!",
         description: "Your short URL has been created",
       })
@@ -177,56 +177,67 @@ export function CreateLink({ isOpen, setIsOpen, onSuccess }) {
       <DialogTrigger asChild>
         <Button variant="destructive">Create New Link</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-w-[95vw] p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle className="font-bold text-2xl">Create New Link</DialogTitle>
+          <DialogTitle className="font-bold text-xl sm:text-2xl">Create New Link</DialogTitle>
         </DialogHeader>
 
         {/* QR Code Preview */}
         <div className="flex justify-center mb-4">
           {qrCodeUrl ? (
             <div className="border border-gray-200 rounded-lg p-2 bg-white">
-              <QRCode ref={qrCodeRef} size={200} value={qrCodeUrl} quietZone={10} ecLevel="H" />
+              <QRCode
+                ref={qrCodeRef}
+                size={150}
+                value={qrCodeUrl}
+                quietZone={10}
+                ecLevel="H"
+                className="w-[150px] h-[150px] sm:w-[200px] sm:h-[200px]"
+              />
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center w-[200px] h-[200px] border border-gray-200 rounded-lg bg-gray-50">
-              <QrCode className="h-12 w-12 text-gray-300 mb-2" />
-              <p className="text-sm text-gray-400">Enter a URL to generate QR code</p>
+            <div className="flex flex-col items-center justify-center w-[150px] h-[150px] sm:w-[200px] sm:h-[200px] border border-gray-200 rounded-lg bg-gray-50">
+              <QrCode className="h-10 w-10 sm:h-12 sm:w-12 text-gray-300 mb-2" />
+              <p className="text-xs sm:text-sm text-gray-400 text-center px-2">
+                Enter a URL to generate Custom QR code
+              </p>
             </div>
           )}
         </div>
 
         {/* Form Fields */}
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           <div>
             <Input
               id="title"
               placeholder="Link Title (e.g. My Blog)"
               value={formValues.title}
               onChange={handleChange}
+              className="h-9 sm:h-10 text-sm sm:text-base"
             />
             {errors.title && <Error message={errors.title} />}
           </div>
 
           <div className="relative">
-            <LinkIcon className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               id="longUrl"
               placeholder="Enter your long URL (e.g. example.com/very-long-url)"
               value={formValues.longUrl}
               onChange={handleChange}
-              className="pl-10"
+              className="pl-10 h-9 sm:h-10 text-sm sm:text-base"
             />
             {errors.longUrl && <Error message={errors.longUrl} />}
           </div>
 
           <div className="flex items-center gap-2">
-            <Card className="p-2 bg-gray-50 text-gray-500 text-sm">yurl.in/</Card>
+            <Card className="p-2 bg-gray-50 text-gray-500 text-xs sm:text-sm">yurl.in/</Card>
             <Input
               id="customUrl"
               placeholder="Custom path (optional)"
               value={formValues.customUrl}
               onChange={handleChange}
+              className="h-9 sm:h-10 text-sm sm:text-base"
             />
           </div>
           {errors.customUrl && <Error message={errors.customUrl} />}
@@ -236,13 +247,13 @@ export function CreateLink({ isOpen, setIsOpen, onSuccess }) {
           {error && <Error message={typeof error === "object" ? error.message : String(error)} />}
         </div>
 
-        <DialogFooter className="sm:justify-start">
+        <DialogFooter className="sm:justify-start mt-4">
           <Button
             type="button"
             variant="destructive"
             onClick={createNewLink}
             disabled={loading || isCheckingCustomUrl}
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto h-9 sm:h-10 text-sm sm:text-base"
           >
             {loading || isCheckingCustomUrl ? <BeatLoader size={8} color="white" /> : "Create Short Link"}
           </Button>
